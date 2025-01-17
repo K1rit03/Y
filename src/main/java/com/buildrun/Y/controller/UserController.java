@@ -6,6 +6,7 @@ import com.buildrun.Y.entities.Role;
 import com.buildrun.Y.entities.User;
 import com.buildrun.Y.repositories.RoleRepository;
 import com.buildrun.Y.repositories.UserRepository;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Value;
 import org.springframework.http.HttpStatus;
@@ -33,13 +34,13 @@ public class UserController {
 
     @Transactional
     @PostMapping("/users")
-    public ResponseEntity<Void> newUser(@RequestBody CreateUserDto dto) {
+    public ResponseEntity<Void> newUser(@RequestBody @Valid CreateUserDto dto) {
 
         var basicRole = roleRepository.findByName(Role.Values.BASIC.name());
 
         var userFromDb = userRepository.findByUsername(dto.username());
-        if (userFromDb.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        if(userFromDb.isPresent()){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "User already exists");
         }
 
         var user = new User();
